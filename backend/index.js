@@ -62,11 +62,39 @@ const init = async () => {
     },
   });
 
-  // TODO: GET /todos
+  server.route({
+    method: "GET",
+    path: "/todos",
+    options: {
+      // TODO: fix documentation
+      description: "Get to-do-list",
+      notes: "Returns the to-do-list filtered by state and ordered.",
+      tags: ["api"],
+      validate: {
+        query: Joi.object({
+          filter: Joi.string()
+            .valid("ALL", "COMPLETE", "INCOMPLETE")
+            .default("ALL"),
+          orderBy: Joi.string()
+            .valid("DESCRIPTION", "CREATED_AT", "COMPLETED_AT")
+            .default("CREATED_AT"),
+        }),
+      },
+      // TODO: validate response
+    },
+    handler: async (request, h) => {
+      const filter = request.query.filter;
+      const orderBy = request.query.orderBy.toLowerCase();
 
-  // TODO: PATCH /todo/{id}
-
-  // TODO: DELETE /todo/{id}
+      try {
+        const items = await db.list(filter, orderBy);
+        return h.response(items).code(200);
+      } catch (error) {
+        console.error("Error fetching tasks: ", error);
+        return h.response({ error: "Error fetching tasks" }).code(500);
+      }
+    },
+  });
 
   await server.start();
   console.log("Server running on %s", server.info.uri);

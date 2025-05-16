@@ -17,8 +17,12 @@ function add(description) {
 }
 
 function list(state, field) {
-  // TODO: fix query
-  return db("todos").where("state", String(state)).orderBy(`${field}`, "asc");
+  let query = db("todos").orderBy(`${field}`, "asc");
+  return state === "ALL" ? query : query.where("state", `${state}`);
+}
+
+function findId(id) {
+  return db("todos").where("id", Number(id)).first();
 }
 
 function edit(id, state, description) {
