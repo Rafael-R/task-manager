@@ -42,14 +42,21 @@ const init = async () => {
       description: "Add an item to the to-do list",
       notes: "A description must be provided.",
       tags: ["api"],
+      validate: {
+        payload: Joi.object({
+          description: Joi.string(),
+        }),
+      },
+      // TODO: validate response
     },
-    // TODO: validate payload
     handler: async (request, h) => {
+      const description = request.payload.description;
+
       try {
-        const item = await db.add(request.payload.description);
+        const item = await db.add(description);
         return h.response(item).code(201);
       } catch (error) {
-        console.error("Error adding item to db: ", error);
+        console.error("Error creating task: ", error);
         return h.response({ error: "Error creating task" }).code(500);
       }
     },
