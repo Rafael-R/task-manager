@@ -162,6 +162,45 @@ const init = async () => {
     },
   });
 
+  server.route({
+    method: "DELETE",
+    path: "/todos/{id}",
+    options: {
+      // TODO: fix documentation
+      description: "Delete to-do-list item",
+      notes: "TODO",
+      tags: ["api"],
+      validate: {
+        params: Joi.object({
+          id: Joi.number().integer().min(1).required(),
+        }),
+      },
+      // TODO: validate response
+    },
+    handler: async (request, h) => {
+      const id = request.params.id;
+
+      try {
+        const toUpdate = await db.findId(id);
+
+        // verify if the referenced item (id) exists
+        if (!toUpdate) {
+          return h
+            .response({ error: `Can't find task with given ID (${id})` })
+            .code(404);
+        }
+
+        await db.remove(id);
+        return h.response().code(204);
+      } catch (error) {
+        console.error(`Error editing task with given ID (${id}): `, error);
+        return h
+          .response({ error: `Error editing task with given ID (${id})` })
+          .code(500);
+      }
+    },
+  });
+
   await server.start();
   console.log("Server running on %s", server.info.uri);
 };

@@ -34,6 +34,5 @@ function edit(id, updateFields) {
 }
 
 function remove(id) {
-  // TODO: fix query
   return db("todos").where("id", Number(id)).delete();
 }
