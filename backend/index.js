@@ -96,6 +96,72 @@ const init = async () => {
     },
   });
 
+  server.route({
+    method: "PATCH",
+    path: "/todos/{id}",
+    options: {
+      // TODO: fix documentation
+      description: "Edit to-do-list item",
+      notes: "TODO",
+      tags: ["api"],
+      validate: {
+        params: Joi.object({
+          id: Joi.number().integer().min(1).required(),
+        }),
+        payload: Joi.object({
+          state: Joi.string().valid("COMPLETE", "INCOMPLETE"),
+          description: Joi.string(),
+        }).min(1),
+      },
+      // TODO: validate response
+    },
+    handler: async (request, h) => {
+      const id = request.params.id;
+      const state = request.payload.state;
+      const description = request.payload.description;
+
+      try {
+        const toUpdate = await db.findId(id);
+
+        // verify if the referenced item (id) exists
+        if (!toUpdate) {
+          return h
+            .response({ error: `Can't find task with given ID (${id})` })
+            .code(404);
+        }
+
+        // verify if the task desciption can be changed
+        if (toUpdate.state === "COMPLETE" && description !== undefined) {
+          return h
+            .response({ error: "Can't edit a task that is completed" })
+            .code(400);
+        }
+
+        // TODO: check verifications
+        const updateFields = {};
+        if (state !== undefined) {
+          updateFields.state = state;
+          if (state === "COMPLETE" && toUpdate.completedAt === null) {
+            updateFields.completed_at = new Date().toISOString();
+          } else if (state === "INCOMPLETE") {
+            updateFields.completed_at = null;
+          }
+        }
+        if (description !== undefined) {
+          updateFields.description = description;
+        }
+
+        const updatedItem = await db.edit(id, updateFields);
+        return h.response(updatedItem).code(200);
+      } catch (error) {
+        console.error(`Error editing task with given ID (${id}): `, error);
+        return h
+          .response({ error: `Error editing task with given ID (${id})` })
+          .code(500);
+      }
+    },
+  });
+
   await server.start();
   console.log("Server running on %s", server.info.uri);
 };

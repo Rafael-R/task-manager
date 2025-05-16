@@ -6,6 +6,7 @@ const db = knex(config.development);
 module.exports = {
   add,
   list,
+  findId,
   edit,
   remove,
 };
@@ -25,9 +26,11 @@ function findId(id) {
   return db("todos").where("id", Number(id)).first();
 }
 
-function edit(id, state, description) {
-  // TODO: fix query
-  return db("todos").where("id", Number(id)).update();
+function edit(id, updateFields) {
+  return db("todos")
+    .returning(["id", "state", "description", "created_at", "completed_at"])
+    .where("id", Number(id))
+    .update(updateFields);
 }
 
 function remove(id) {
