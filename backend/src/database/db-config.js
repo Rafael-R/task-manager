@@ -1,38 +1,38 @@
 const knex = require("knex");
-const config = require("../knexfile");
+const config = require("./knexfile");
 
 const db = knex(config.development);
 
-module.exports = {
-  add,
-  list,
-  findId,
-  edit,
-  remove,
-};
-
-function add(description) {
+async function add(description) {
   return db("todos")
     .returning(["id", "state", "description", "created_at", "completed_at"])
     .insert({ description: description });
 }
 
-function list(state, field) {
+async function list(state, field) {
   let query = db("todos").orderBy(`${field}`, "asc");
   return state === "ALL" ? query : query.where("state", `${state}`);
 }
 
-function findId(id) {
+async function findById(id) {
   return db("todos").where("id", Number(id)).first();
 }
 
-function edit(id, updateFields) {
+async function edit(id, updateFields) {
   return db("todos")
     .returning(["id", "state", "description", "created_at", "completed_at"])
     .where("id", Number(id))
     .update(updateFields);
 }
 
-function remove(id) {
+async function remove(id) {
   return db("todos").where("id", Number(id)).delete();
 }
+
+module.exports = {
+  add,
+  list,
+  findById,
+  edit,
+  remove,
+};

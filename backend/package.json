@@ -2,10 +2,10 @@
   "name": "task-manager-backend",
   "version": "1.0.0",
   "description": "Simple REST API server for managing a \"to-do list\".",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon src/index.js"
   },
   "author": "Rafael Rodrigues",
   "license": "ISC",
