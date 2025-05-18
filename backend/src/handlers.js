@@ -44,11 +44,10 @@ async function editTask(request, h) {
         .response({ error: "Can't edit a task that is completed" })
         .code(400);
     }
-    // TODO: check verifications
     const updateFields = {};
     if (state !== undefined) {
       updateFields.state = state;
-      if (state === "COMPLETE" && toUpdate.completedAt === null) {
+      if (state === "COMPLETE" && toUpdate.completed_at === null) {
         updateFields.completed_at = new Date().toISOString();
       } else if (state === "INCOMPLETE") {
         updateFields.completed_at = null;

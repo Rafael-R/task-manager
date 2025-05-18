@@ -1,21 +1,25 @@
 const Hapi = require("@hapi/hapi");
-const plugins = require('./plugins');
+const plugins = require("./plugins");
 const routes = require("./routes");
 
 const init = async () => {
   const server = Hapi.server({
     port: 8000,
     host: "localhost",
+    routes: {
+      cors: true,
+    },
   });
 
   await server.register(plugins);
+
   server.route(routes);
 
   await server.start();
   console.log("Server running at:", server.info.uri);
 };
 
-process.on('unhandledRejection', (error) => {
+process.on("unhandledRejection", (error) => {
   console.log(error);
   process.exit(1);
 });
